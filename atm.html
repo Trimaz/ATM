@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title></title>
+		<link href="/Content/bootstrap.css" rel="stylesheet" type="text/css" />
+        <link href="/Content/Site.css" rel="stylesheet" type="text/css" />
+        <link href="/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+        <script src="/Scripts/jquery-3.3.1.js"></script>
+        <script src="/Scripts/jquery-3.3.1.min.js"></script>
+        <script src="/Scripts/modernizr-2.3.8.js"></script>
+		<script src="/Scripts/bootstrap.js"></script>
+        <meta name="viewport" content="width=device-width" />
+		<script type="text/javascript">
+			var txtAmount;
+
+			// Add notes of values 1000, 500, 200, 100
+			// New notes are easily added by extending the array
+			var notes = [1000, 500, 200, 100];
+
+			// Add coins of values 20 (40 mm), 10 (20 mm), 5 (50 mm), 2 (30 mm), 1 (10 mm)
+			var coins =
+				[
+					[20, 40],
+					[10, 20],
+					[5, 50],
+					[2, 30],
+					[1, 10],
+				];
+
+			// Large coins have a diameter greater than 20 mm
+			var diameter = 20;
+
+			function body_onLoad() {
+				txtAmount = $("#txtAmount").val();
+
+				var testAmount = 409;
+				$("#txtAmount").val(testAmount);
+				calcPayouts(testAmount);
+			}
+
+			function amount_onChange() {
+				document.title = ($("#txtAmount").val());
+				calcPayouts(document.title);
+			}
+
+			function getAmount(i) {
+				if (i < 0 || i >= (notes.length + coins.length))
+				{ alert("Invalid argument"); return null; }
+
+				if (i < notes.length)
+					return notes[i];
+
+				return coins[i - notes.length][0];
+			}
+
+			function calcPayouts(amount) {
+				var i = 0;
+				var j = 0;
+				var n = 0;
+				var val = 0;
+
+				clearHtml("#box1");
+				clearHtml("#box2");
+				clearHtml("#box3");
+
+				while (amount > 0)
+				{
+					// Ignore payouts larger than the requested amount
+					while (getAmount(i) > amount) i++;
+
+					val = getAmount(i);
+					
+					if ((amount % val) == 0) {
+						n = amount / val;
+					}
+					else {
+						n = Math.floor(amount / val);
+					}
+
+					// Add html to box #1 if val is the amount of a note
+					if (val >= notes[notes.length - 1])
+						addText("#box1", "<div class=\"box box-note\"><img src=\"note.png\" id=\"note"+i+"\" />" + n.toString() + " x " + val + "</div>");
+					else {
+						// For large coins
+						if (coins[i - notes.length][1] > diameter) {
+							addText("#box2", "<div class=\"box box-coin\"><img src=\"coin.png\" id=\"coin"+i+"\" />" + n.toString() + " x " + val + "</div>");
+						}
+						else {
+							addText("#box3", "<div class=\"box box-coin\"><img src=\"coin.png\" id=\"coin"+i+"\" />" + n.toString() + " x " + val + "</div>");
+						}
+
+					}
+
+					j++;
+					amount -= n * val;
+				}
+				scrollTo("#coin" + j);
+			}
+
+			function scrollTo(id) {
+				var position = $(id).offset().top;
+				$("HTML, BODY").animate({ scrollTop: position }, 500);
+			}
+
+			function addText(boxId, str) {
+				var txt = $(boxId).html();
+				txt += str;
+				$(boxId).html(txt);
+			}
+
+			function clearHtml(boxId) { $(boxId).html(""); }
+
+			function numbtn_onClick(digit) {
+				txtAmount = $("#txtAmount").val();
+				$("#txtAmount").val($("#txtAmount").val() + digit);
+				$("#txtAmount").focus();
+			}
+
+			function delbtn_onClick() {
+				var len = $("#txtAmount").val().length;
+				if (len > 1)
+					($("#txtAmount").val(txtAmount.substr(0, len - 1)));
+			}
+		</script>
+    </head>
+    <body onload="body_onLoad();">
+        <div id="body">
+            <section class="content-wrapper main-content clear-fix" style="text-align: center;">
+                <div>Select amount</div>
+<input type="text" id="txtAmount" class="caption" style="text-align: center" value="&pound;" onkeyup="amount_onChange();" onchange="amount_onChange();" />
+
+
+<div class="line15"><br /></div>
+<div>
+<a class="btn btn-lg btn-outline btn-circle" onclick="numbtn_onClick('1');">1</a>
+<a class="btn btn-lg btn-outline btn-circle" onclick="numbtn_onClick('2');">2</a>
+<a class="btn btn-lg btn-outline btn-circle" onclick="numbtn_onClick('3');">3</a>
+<br />
+<a class="btn btn-lg btn-outline btn-circle" onclick="numbtn_onClick('4');">4</a>
+<a class="btn btn-lg btn-outline btn-circle" onclick="numbtn_onClick('5');">5</a>
+<a class="btn btn-lg btn-outline btn-circle" onclick="numbtn_onClick('6');">6</a>
+<br />
+<a class="btn btn-lg btn-outline btn-circle" onclick="numbtn_onClick('7');">7</a>
+<a class="btn btn-lg btn-outline btn-circle" onclick="numbtn_onClick('8');">8</a>
+<a class="btn btn-lg btn-outline btn-circle" onclick="numbtn_onClick('9');">9</a>
+<br />
+	<div>
+		<a id="btn_del" class="btn btn-lg btn-outline btn-circle" onclick="delbtn_onClick();" style="max-width: 45px; padding-left: 12px;">&#8592;</a>
+		<a class="btn btn-lg btn-outline btn-circle" onclick="numbtn_onClick('0');">0</a>
+	</div>
+</div>
+
+<div class="line15"><br /><br /></div>
+<a href="#" class="btn btn-lg btn-outline btn-circle btn-submit" onclick="calcPayouts($('#txtAmount').val()); scrollTo('#note1');">submit</a>
+
+<div id="box1"></div>
+<div id="box2"></div>
+<div id="box3"></div>
+            </section>
+        </div>
+        
+    </body>
+</html>
+
+<!--
+	
+
+
+
+<div class="jumbotron">
+    <h1>ASP.NET</h1>
+    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
+    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>Getting started</h2>
+        <p>
+            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
+            enables a clean separation of concerns and gives you full control over markup
+            for enjoyable, agile development.
+        </p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Get more libraries</h2>
+        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Web Hosting</h2>
+        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
+        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+    </div>
+</div>
+-->
